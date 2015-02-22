@@ -1,0 +1,151 @@
+---
+title: "Disgust Graphs"
+author: "Barry Sheppard"
+date: "22 February 2015"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+
+#Demographics
+
+#RWA histogram
+ChartRWA <- ggplot(dat, aes(x=RWAscore)) + geom_histogram(binwidth=5, colour="black", fill="lightgrey") +
+  geom_vline(aes(xintercept=mean(RWAscore)),   # Ignore NA values for mean
+             color="#ba1026", linetype="dashed", size=1) +
+  ggtitle("RWA Scores") +
+  xlab("") +
+  ylab("") +
+  theme_bw()
+ChartRWA
+
+#Gender barchart
+ChartGender <- ggplot(dat, aes(x=Sex, fill=Sex)) + 
+  theme_bw() +
+  geom_bar(binwidth=5, colour="Black", guide=FALSE) +
+  scale_fill_manual(values=c("#10baa4", "#ba1026"), guide=FALSE) +
+  ggtitle("Gender") +
+  xlab("") +
+  ylab("") +
+  stat_bin(binwidth=1, geom="text", aes(label=..count..), vjust= +2)
+ChartGender
+
+#Age histogram
+ChartAge <- ggplot(dat, aes(x=Age)) + geom_histogram(binwidth=5, colour="black", fill="lightgrey") +
+  geom_vline(aes(xintercept=mean(Age)),   # Ignore NA values for mean
+             color="#ba1026", linetype="dashed", size=1) +
+  ggtitle("Age") +
+  xlab("") +
+  ylab("") +
+  theme_bw() 
+ChartAge
+
+# Country map
+
+# This first part is for translating the ip numbers into country names. Commented out as I don't want to accidentily run it again
+# ips[] <- lapply(ips, as.character)
+# countries <- freegeoip(ips[,1])$country_name
+# At this stage I can see the data in summary of countries, so I'm just going to write it straight in.
+
+d <- data.frame(
+  country=c("Ireland", "United Kingdom", "Sweden", "United States", "France","Denmark","Australia","Canada","Czech Republic","Singapore","Netherlands","Estonia","Brazil","New Zealand","South Africa","Romania","Germany","Italy","Gibraltar"),
+  value=c(57, 91, 2, 170, 2, 2, 6, 9, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1))
+n <- joinCountryData2Map(d, joinCode="NAME", nameJoinColumn="country")
+
+
+colourpalette <-brewer.pal(8,'Greens') 
+#mapCountryData(n, xlim=c(-10, 40), ylim=c(35, 70), nameColumnToPlot="value", mapTitle="",oceanCol="lightblue",missingCountryCol="lightgrey", catMethod=c(0,25,50,75,100,125,150,175,200), colourPalette=colourpalette)
+MapChart <- mapCountryData(n, xlim=c(-120, 130), ylim=c(-50, 50), nameColumnToPlot="value", mapTitle="Participant location",oceanCol="lightblue",missingCountryCol="lightgrey", catMethod=c(0,25,50,75,100,125,150,175,200), colourPalette=colourpalette)
+MapChart
+
+
+dbar <- data.frame(
+  country=c("Ireland", "United Kingdom", "United States" ,"Australia","Canada","Other"),
+  value=c(57, 91, 170, 6, 9, 19 ))
+
+ChartCountries <- ggplot(dbar, aes(x=reorder(country, value),y=value,fill=country)) + geom_bar(stat="identity") +
+  ggtitle("Country") +
+  xlab("") +
+  ylab("") +
+  coord_flip() +
+  theme_bw()+
+  scale_fill_manual(values=c("#10baa4", "#a410ba","#baa410", "#ba1026","#10baa4", "#ba4f10"), guide=FALSE) +
+  geom_text(aes(label = value), hjust=1)
+ChartCountries
+
+#Multiplot doesn't draw the MapChart :( must only for ggplot
+multiplot(ChartAge, ChartGender, ChartCountries, ChartRWA, cols=2)
+
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+
+#SCATTERPLOTS
+
+# Age correlation scatterplot for cooked crickets
+sp1 <- ggplot(dat, aes(x=Age, y=BeforeCricket)) +
+  geom_point(shape=1,position=position_jitter(height=.2)) +   
+  geom_smooth(method=lm) +   # Add linear regression line 
+#  (by default includes 95% confidence region)
+  ggtitle("Cooked crickets") +
+  scale_y_continuous(limits=c(0, 10.2), breaks=0:10*2) +   
+  theme_bw() +
+  xlab("") +
+  ylab("")
+  
+# Age correlation scatterplot for bug based bar
+sp2 <- ggplot(dat, aes(x=Age, y=BeforeCricketBar)) +
+  geom_point(shape=1,      # Use hollow circles
+             position=position_jitter(height=.2)) +  
+  geom_smooth(method=lm) +   # Add linear regression line 
+  #  (by default includes 95% confidence region)
+  ggtitle("Cricket flour bar")+
+  scale_y_continuous(limits=c(0, 10.2), breaks=0:10*2) +   
+  theme_bw()+
+  xlab("") +
+  ylab("")
+
+#Draw the plots
+multiplot(sp1, sp2, cols=2)
+
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+
+#box plots for crickets
+bp1 <- ggplot(dat, aes(x=Sex, y=BeforeCricket, fill=Sex)) + 
+  geom_boxplot()
+bp1 <- bp1 + scale_fill_manual(values=c("#10baa4", "#ba1026"),guide=FALSE) + 
+  theme_bw()  +
+  scale_y_continuous(limits=c(0, 10.2), breaks=0:10*2) +  
+  theme(legend.position="top") +
+  ggtitle("Cooked crickets") +
+  ylab("") +
+  xlab("")
+
+#box plots for bug based bar
+bp2 <- ggplot(dat, aes(x=Sex, y=BeforeCricketBar, fill=Sex)) + 
+  geom_boxplot()
+bp2 <- bp2 + scale_fill_manual(values=c("#10baa4", "#ba1026"),guide=FALSE, 
+                       name="",
+                       labels=c("Male", "Female")) + 
+  theme_bw()  +
+  scale_y_continuous(limits=c(0, 10.2), breaks=0:10*2) +  
+  theme(legend.position="top") +
+  ggtitle("Cricket flour bars")+
+  ylab("") +
+  xlab("")
+
+#Draw the plots
+multiplot(bp1, bp2, cols=2)
+
+```
