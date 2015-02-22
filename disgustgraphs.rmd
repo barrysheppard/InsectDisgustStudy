@@ -5,13 +5,12 @@ date: "22 February 2015"
 output: html_document
 ---
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+This is my first shot at using R graphs.
+For this I've been using some research on insect disgust and will be using the charts as part of an upcoming presentation.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Importing libraries and data
 
 ```{r}
-
-
 #import libraries
 library(ggplot2)
 library(plyr)
@@ -33,11 +32,13 @@ levels(dat$Sex)[levels(dat$Sex)=="2"] <- "Male"
 
 #Set of IPs only, editted out as I don't want to upload the ips onto github
 # ips <- read.csv("IP.csv") 
+```
+
+These are some functions that other people wrote which were used during this. Notably much of the rest of the code started as someone elses guide on a website and was chopped at like a blind woodsman until I had what I needed.
 
 
-
-
-#Functions
+```{r}
+#Functions made by other people to do stuff!
 
 #Freegeop function to translate the ips into countries
 freegeoip <- function(ip, format = ifelse(length(ip)==1,'list','dataframe'))
@@ -142,6 +143,12 @@ summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
   return(datac)
 }
 
+```
+
+These demographic charts give an overview of participants.
+
+```{r}
+
 # Lets do some charts!
 
 #Demographics
@@ -212,7 +219,11 @@ ChartCountries
 
 #Multiplot doesn't draw the MapChart :( must only for ggplot
 multiplot(ChartAge, ChartGender, ChartCountries, ChartRWA, cols=2)
+```
 
+Scatterplots to show some correlations
+
+```{r}
 
 #SCATTERPLOTS
 
@@ -243,6 +254,41 @@ sp2 <- ggplot(dat, aes(x=Age, y=BeforeCricketBar)) +
 multiplot(sp1, sp2, cols=2)
 
 
+
+# RWA correlation scatterplot for cricket
+rwa2 <- ggplot(dat, aes(x=RWAscore, y=CricketChange)) +
+  geom_point(shape=1, position=position_jitter(height=.2)) +
+  geom_smooth(method=lm) +   # Add linear regression line 
+#  (by default includes 95% confidence region)
+  ggtitle("RWA / Cooked cricket rating change") +
+  scale_y_continuous(limits=c(-6, 7), breaks=-5:5*2) +  
+  theme(legend.position="top") +
+  ylab("") +
+  xlab("") +
+  theme_bw()
+
+# RWA correlation scatterplot for cricket
+rwa3 <- ggplot(dat, aes(x=RWAscore, y=BarChange)) +
+  geom_point(shape=1,      # Use hollow circles
+             position=position_jitter(height=.2)) + 
+  geom_smooth(method=lm) +   # Add linear regression line 
+  #  (by default includes 95% confidence region)
+  theme_bw() +
+  ggtitle("RWA / Cricket flour bar rating change") +
+  scale_y_continuous(limits=c(-6, 7), breaks=-5:5*2) +  
+  theme(legend.position="top") +
+  ylab("") +
+  xlab("")
+
+#Draw the plots
+multiplot(rwa2, rwa3, cols=2)
+
+```
+
+
+Boxplots to compare means
+
+```{r}
 
 #BOX PLOTS
 
@@ -275,35 +321,12 @@ bp2 <- bp2 + scale_fill_manual(values=c("#10baa4", "#ba1026"),guide=FALSE,
 multiplot(bp1, bp2, cols=2)
 
 
+```
 
-# RWA correlation scatterplot for cricket
-rwa2 <- ggplot(dat, aes(x=RWAscore, y=CricketChange)) +
-  geom_point(shape=1, position=position_jitter(height=.2)) +
-  geom_smooth(method=lm) +   # Add linear regression line 
-#  (by default includes 95% confidence region)
-  ggtitle("RWA / Cooked cricket rating change") +
-  scale_y_continuous(limits=c(-6, 7), breaks=-5:5*2) +  
-  theme(legend.position="top") +
-  ylab("") +
-  xlab("") +
-  theme_bw()
 
-# RWA correlation scatterplot for cricket
-rwa3 <- ggplot(dat, aes(x=RWAscore, y=BarChange)) +
-  geom_point(shape=1,      # Use hollow circles
-             position=position_jitter(height=.2)) + 
-  geom_smooth(method=lm) +   # Add linear regression line 
-  #  (by default includes 95% confidence region)
-  theme_bw() +
-  ggtitle("RWA / Cricket flour bar rating change") +
-  scale_y_continuous(limits=c(-6, 7), breaks=-5:5*2) +  
-  theme(legend.position="top") +
-  ylab("") +
-  xlab("")
+A wordcloud. Pretty but limited in actual graphical value. It will make a nice back image while I talk about the actual qualitive elements of the study.
 
-#Draw the plots
-multiplot(rwa2, rwa3, cols=2)
-
+```{r}
 
 
 # Word cloud
@@ -316,9 +339,15 @@ words <- tm_map(words, removeWords, c("eating","eat","eaten"))
 words <- tm_map(words, removeWords, c("crickets","cricket","insects","insect"))
 wordcloud(words, max.words=100, min.freq=5, random.order=FALSE, rot.per=0.35, colors=brewer.pal(8, "Dark2"))
 
+```
 
 
-# Before and after histograms
+The barcharts required a little bit of rework on the data to get it where I wanted it.
+
+
+```{r}
+
+# Before and after barcharts
 
 # Prepping the data, the code wanted it in a particular format so I just went with that
 
@@ -385,5 +414,5 @@ multiplot(BarChart1, BarChart2, cols=2)
 
 ```
 
-You can also embed plots, for example:
+Fun!
 
