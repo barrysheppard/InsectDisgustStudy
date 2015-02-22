@@ -1,4 +1,6 @@
 
+setwd("/Users/barrysheppard/GitHub/Disgust")
+
 #import libraries
 library(ggplot2)
 library(plyr)
@@ -12,15 +14,101 @@ library(rworldmap)
 #Import data
 
 #Main dataset
-dat <- read.csv("Disgust dataset.csv")
-#Change the gender to 1 for Male and 2 for Female
-dat$Sex <- factor(dat$Sex)
-levels(dat$Sex)[levels(dat$Sex)=="1"] <- "Female"
-levels(dat$Sex)[levels(dat$Sex)=="2"] <- "Male"
+dat <- read.csv("DisgustData.csv")
+
+#Shorten some of the names
+names(dat)[5] <- "Age"
+names(dat)[6] <- "Sex"
+names(dat)[29] <- "BeforeCricket"
+names(dat)[30] <- "BeforeCricketBar"
+names(dat)[31] <- "Group"
+names(dat)[32] <- "AfterCricketBar"
+names(dat)[33] <- "AfterCricket"
+
+names(dat)[7] <- "RWA01"
+names(dat)[8] <- "RWA02"
+names(dat)[9] <- "RWA03"
+names(dat)[10] <- "RWA04"
+names(dat)[11] <- "RWA05"
+names(dat)[12] <- "RWA06"
+names(dat)[13] <- "RWA07"
+names(dat)[14] <- "RWA08"
+names(dat)[15] <- "RWA09"
+names(dat)[16] <- "RWA10"
+names(dat)[17] <- "RWA11"
+names(dat)[18] <- "RWA12"
+names(dat)[19] <- "RWA13"
+names(dat)[20] <- "RWA14"
+names(dat)[21] <- "RWA15"
+names(dat)[22] <- "RWA16"
+names(dat)[23] <- "RWA17"
+names(dat)[24] <- "RWA18"
+names(dat)[25] <- "RWA19"
+names(dat)[26] <- "RWA20"
+names(dat)[27] <- "RWA21"
+names(dat)[28] <- "RWA22"
+names(dat)[34] <- "Comments"
+
+
+likert_to_number <- function(x){
+  x <- revalue(x, c("-4 You very strongly disagree with the statement."="-4",
+                                    "-3 You strongly disagree with the statement. "="-3",
+                                    "-2 You moderately disagree with the statement."="-2",
+                                    "-1 You slightly disagree with the statement."="-1",
+                                    "0 You feel exactly and precisely neutral about an item."="0",
+                                    "+1 You slightly agree with the statement. "="1",
+                                    "+2 You moderately agree with the statement."="2",
+                                    "+3 You strongly agree with the statement. "="3",
+                                    "+4 You very strongly agree with the statement."="4"
+      )   )
+  
+  return(x)
+}
+
+dat$RWA01 <- likert_to_number(dat$RWA01)
+dat$RWA02 <- likert_to_number(dat$RWA02)
+dat$RWA03 <- likert_to_number(dat$RWA03)
+dat$RWA04 <- likert_to_number(dat$RWA04)
+dat$RWA05 <- likert_to_number(dat$RWA05)
+dat$RWA06 <- likert_to_number(dat$RWA06)
+dat$RWA07 <- likert_to_number(dat$RWA07)
+dat$RWA08 <- likert_to_number(dat$RWA08)
+dat$RWA09 <- likert_to_number(dat$RWA09)
+dat$RWA10 <- likert_to_number(dat$RWA10)
+dat$RWA11 <- likert_to_number(dat$RWA11)
+dat$RWA12 <- likert_to_number(dat$RWA12)
+dat$RWA13 <- likert_to_number(dat$RWA13)
+dat$RWA14 <- likert_to_number(dat$RWA14)
+dat$RWA15 <- likert_to_number(dat$RWA15)
+dat$RWA16 <- likert_to_number(dat$RWA16)
+dat$RWA17 <- likert_to_number(dat$RWA17)
+dat$RWA18 <- likert_to_number(dat$RWA18)
+dat$RWA19 <- likert_to_number(dat$RWA19)
+dat$RWA20 <- likert_to_number(dat$RWA20)
+dat$RWA21 <- likert_to_number(dat$RWA21)
+dat$RWA22 <- likert_to_number(dat$RWA22)
+
+# Next lets score the RWA results
+# Scores go from 20 to 180
+# Question 1 and 2 are test questions and not used
+# Positive scores are 3, 5, 7, 10, 12, 14, 16, 17, 19 and 22 
+# Add all the positive scores and add 50
+# The remainder are reversed questions, we could recode but its easier to do the following
+# Start with 50 and substract the total of the negative scores
+
+dat$RWAscore <- 100 + as.numeric(as.character(dat$RWA03)) + as.numeric(as.character(dat$RWA05)) + 
+  as.numeric(as.character(dat$RWA07)) + as.numeric(as.character(dat$RWA10)) + as.numeric(as.character(dat$RWA12)) + 
+  as.numeric(as.character(dat$RWA14)) + as.numeric(as.character(dat$RWA16)) + as.numeric(as.character(dat$RWA17)) + 
+  as.numeric(as.character(dat$RWA19)) + as.numeric(as.character(dat$RWA22)) - as.numeric(as.character(dat$RWA04)) - 
+  as.numeric(as.character(dat$RWA06)) - as.numeric(as.character(dat$RWA08)) - as.numeric(as.character(dat$RWA09)) - 
+  as.numeric(as.character(dat$RWA11)) - as.numeric(as.character(dat$RWA13)) - as.numeric(as.character(dat$RWA15)) - 
+  as.numeric(as.character(dat$RWA18)) - as.numeric(as.character(dat$RWA20)) - as.numeric(as.character(dat$RWA21))
+
+dat$CricketChange <- dat$AfterCricket - dat$BeforeCricket
+dat$BarChange <- dat$AfterCricketBar - dat$BeforeCricket
 
 #Set of IPs only, editted out as I don't want to upload the ips onto github
 # ips <- read.csv("IP.csv") 
-
 
 
 
@@ -230,6 +318,34 @@ sp2 <- ggplot(dat, aes(x=Age, y=BeforeCricketBar)) +
 multiplot(sp1, sp2, cols=2)
 
 
+# RWA correlation scatterplot for cricket
+rwa2 <- ggplot(dat, aes(x=RWAscore, y=CricketChange)) +
+  geom_point(shape=1, position=position_jitter(height=.2)) +
+  geom_smooth(method=lm) +   # Add linear regression line 
+  #  (by default includes 95% confidence region)
+  ggtitle("RWA / Cooked cricket rating change") +
+  scale_y_continuous(limits=c(-6, 7), breaks=-5:5*2) +  
+  theme(legend.position="top") +
+  ylab("") +
+  xlab("") +
+  theme_bw()
+
+# RWA correlation scatterplot for cricket
+rwa3 <- ggplot(dat, aes(x=RWAscore, y=BarChange)) +
+  geom_point(shape=1,      # Use hollow circles
+             position=position_jitter(height=.2)) + 
+  geom_smooth(method=lm) +   # Add linear regression line 
+  #  (by default includes 95% confidence region)
+  theme_bw() +
+  ggtitle("RWA / Cricket flour bar rating change") +
+  scale_y_continuous(limits=c(-6, 7), breaks=-5:5*2) +  
+  theme(legend.position="top") +
+  ylab("") +
+  xlab("")
+
+#Draw the plots
+multiplot(rwa2, rwa3, cols=2)
+
 
 #BOX PLOTS
 
@@ -263,38 +379,12 @@ multiplot(bp1, bp2, cols=2)
 
 
 
-# RWA correlation scatterplot for cricket
-rwa2 <- ggplot(dat, aes(x=RWAscore, y=CricketChange)) +
-  geom_point(shape=1, position=position_jitter(height=.2)) +
-  geom_smooth(method=lm) +   # Add linear regression line 
-#  (by default includes 95% confidence region)
-  ggtitle("RWA / Cooked cricket rating change") +
-  scale_y_continuous(limits=c(-6, 7), breaks=-5:5*2) +  
-  theme(legend.position="top") +
-  ylab("") +
-  xlab("") +
-  theme_bw()
-
-# RWA correlation scatterplot for cricket
-rwa3 <- ggplot(dat, aes(x=RWAscore, y=BarChange)) +
-  geom_point(shape=1,      # Use hollow circles
-             position=position_jitter(height=.2)) + 
-  geom_smooth(method=lm) +   # Add linear regression line 
-  #  (by default includes 95% confidence region)
-  theme_bw() +
-  ggtitle("RWA / Cricket flour bar rating change") +
-  scale_y_continuous(limits=c(-6, 7), breaks=-5:5*2) +  
-  theme(legend.position="top") +
-  ylab("") +
-  xlab("")
-
-#Draw the plots
-multiplot(rwa2, rwa3, cols=2)
-
 
 
 # Word cloud
-words <- Corpus (DirSource("comments/"))
+# To load words files in a folder use DirSource instead
+# words <- Corpus (DirSource("comments/"))
+words <- Corpus (VectorSource(dat$Comments))
 words <- tm_map(words, stripWhitespace)
 words <- tm_map(words, content_transformer(tolower))
 words <- tm_map(words, removeWords, stopwords("english"))
