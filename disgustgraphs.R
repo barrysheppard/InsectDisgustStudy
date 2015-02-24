@@ -291,28 +291,34 @@ multiplot(ChartAge, ChartGender, ChartCountries, ChartRWA, cols=2)
 
 #SCATTERPLOTS
 
-# Age correlation scatterplot for cooked crickets
+# Age correlation scatterplot for Whole crickets
 sp1 <- ggplot(dat, aes(x=Age, y=BeforeCricket)) +
-  geom_point(shape=1,position=position_jitter(height=.2)) +   
+  geom_point(shape=19,      # Use solid circles
+             alpha=1/4) +    # 1/4 opacity
+  #  geom_point(shape=1,position=position_jitter(height=.2)) +   
   geom_smooth(method=lm) +   # Add linear regression line 
 #  (by default includes 95% confidence region)
-  ggtitle("Cooked crickets") +
-  scale_y_continuous(limits=c(0, 10.2), breaks=0:10*2) +   
+  ggtitle("Whole cricket") +
+  scale_y_continuous(limits=c(1, 10), breaks=0:10*2) +   
   theme_bw() +
-  xlab("") +
-  ylab("")
-  
+  xlab("Age") +
+  ylab("Rating of likelihood to eat")+
+  theme(plot.title = element_text(face="bold"))
+
 # Age correlation scatterplot for bug based bar
 sp2 <- ggplot(dat, aes(x=Age, y=BeforeCricketBar)) +
-  geom_point(shape=1,      # Use hollow circles
-             position=position_jitter(height=.2)) +  
+#  geom_point(shape=1,      # Use hollow circles
+#             position=position_jitter(height=.2)) +  
+  geom_point(shape=19,      # Use solid circles
+             alpha=1/4) +    # 1/4 opacity
   geom_smooth(method=lm) +   # Add linear regression line 
   #  (by default includes 95% confidence region)
   ggtitle("Cricket flour bar")+
-  scale_y_continuous(limits=c(0, 10.2), breaks=0:10*2) +   
+  scale_y_continuous(limits=c(1, 10), breaks=0:10*2) +   
   theme_bw()+
-  xlab("") +
-  ylab("")
+  xlab("Age") +
+  ylab("Rating of likelihood to eat")+
+  theme(plot.title = element_text(face="bold"))
 
 #Draw the plots
 multiplot(sp1, sp2, cols=2)
@@ -320,65 +326,96 @@ multiplot(sp1, sp2, cols=2)
 
 # RWA correlation scatterplot for cricket
 rwa2 <- ggplot(dat, aes(x=RWAscore, y=CricketChange)) +
-  geom_point(shape=1, position=position_jitter(height=.2)) +
+#  geom_point(shape=1, position=position_jitter(height=.2)) +
+  geom_point(shape=19,      # Use solid circles
+             alpha=1/4) +    # 1/4 opacity
   geom_smooth(method=lm) +   # Add linear regression line 
   #  (by default includes 95% confidence region)
-  ggtitle("RWA / Cooked cricket rating change") +
+  ggtitle("RWA / Whole cricket rating change") +
   scale_y_continuous(limits=c(-6, 7), breaks=-5:5*2) +  
   theme(legend.position="top") +
-  ylab("") +
-  xlab("") +
-  theme_bw()
+  xlab("Right-Wing Authoritarianism score") +
+  ylab("Change in rating of likelihood to eat") +
+  theme_bw()+
+  theme(plot.title = element_text(face="bold"))
 
 # RWA correlation scatterplot for cricket
 rwa3 <- ggplot(dat, aes(x=RWAscore, y=BarChange)) +
-  geom_point(shape=1,      # Use hollow circles
-             position=position_jitter(height=.2)) + 
+  geom_point(shape=19,      # Use solid circles
+             alpha=1/4) +    # 1/4 opacity
+#  geom_point(shape=1,      # Use hollow circles
+#             position=position_jitter(height=.2)) + 
   geom_smooth(method=lm) +   # Add linear regression line 
   #  (by default includes 95% confidence region)
   theme_bw() +
   ggtitle("RWA / Cricket flour bar rating change") +
   scale_y_continuous(limits=c(-6, 7), breaks=-5:5*2) +  
   theme(legend.position="top") +
-  ylab("") +
-  xlab("")
+  xlab("Right-Wing Authoritarianism score") +
+  ylab("Change in rating of likelihood to eat")+
+  theme(plot.title = element_text(face="bold"))
 
 #Draw the plots
 multiplot(rwa2, rwa3, cols=2)
 
 
-#BOX PLOTS
-
+#BOX PLOTS - After feedback the boxplots were taken out
 
 #box plots for crickets
-bp1 <- ggplot(dat, aes(x=Sex, y=BeforeCricket, fill=Sex)) + 
-  geom_boxplot()
-bp1 <- bp1 + scale_fill_manual(values=c("#10baa4", "#ba1026"),guide=FALSE) + 
-  theme_bw()  +
-  scale_y_continuous(limits=c(0, 10.2), breaks=0:10*2) +  
-  theme(legend.position="top") +
-  ggtitle("Cooked crickets") +
-  ylab("") +
-  xlab("")
+# bp1 <- ggplot(dat, aes(x=Sex, y=BeforeCricket, fill=Sex)) + 
+#   geom_boxplot()
+# bp1 <- bp1 + scale_fill_manual(values=c("#10baa4", "#ba1026"),guide=FALSE) + 
+#   theme_bw()  +
+#   scale_y_continuous(limits=c(0, 10.2), breaks=0:10*2) +  
+#   theme(legend.position="top") +
+#   ggtitle("Whole crickets") +
+#   ylab("Initial rating of likelihood of eating") +
+#   xlab("Gender")
+# 
+# #box plots for bug based bar
+# bp2 <- ggplot(dat, aes(x=Sex, y=BeforeCricketBar, fill=Sex)) + 
+#   geom_boxplot()
+# bp2 <- bp2 + scale_fill_manual(values=c("#10baa4", "#ba1026"),guide=FALSE, 
+#                        name="",
+#                        labels=c("Male", "Female")) + 
+#   theme_bw()  +
+#   scale_y_continuous(limits=c(0, 10.2), breaks=0:10*2) +  
+#   theme(legend.position="top") +
+#   ggtitle("Cricket flour bars")+
+#   ylab("Initial rating of likelihood of eating") +
+#   xlab("Gender")
+# 
+# #Draw the plots
+# multiplot(bp1, bp2, cols=2)
 
-#box plots for bug based bar
-bp2 <- ggplot(dat, aes(x=Sex, y=BeforeCricketBar, fill=Sex)) + 
-  geom_boxplot()
-bp2 <- bp2 + scale_fill_manual(values=c("#10baa4", "#ba1026"),guide=FALSE, 
-                       name="",
-                       labels=c("Male", "Female")) + 
-  theme_bw()  +
-  scale_y_continuous(limits=c(0, 10.2), breaks=0:10*2) +  
-  theme(legend.position="top") +
-  ggtitle("Cricket flour bars")+
-  ylab("") +
-  xlab("")
 
-#Draw the plots
-multiplot(bp1, bp2, cols=2)
+# Overlapped Gender Bar Chart
 
+G3 <- ggplot(dat, aes(x=BeforeCricket, fill=Sex)) + 
+  geom_histogram(binwidth=1, alpha=.5, position="dodge", colour="black", size=.3) + 
+  theme_bw() +
+  ylab("Number of participants") +
+  xlab("Rating of likelihood of eating a Whole cricket") +
+  scale_fill_manual(values=c("Pink", "LightBlue"), name="Gender") +
+  ggtitle("Gender differences in rating of likelihood of eating Whole Cricket") +
+  scale_x_continuous(limits=c(1, 10), breaks=0:10*1) +
+  theme_bw() +
+  theme(legend.position=c(.5, .8)) + 
+  guides(fill = guide_legend(nrow = 1))
 
+G4 <- ggplot(dat, aes(x=BeforeCricketBar, fill=Sex)) + 
+  geom_histogram(binwidth=1, alpha=.5, position="dodge", colour="black", size=.3) + 
+  theme_bw() +
+  ylab("Number of participants") +
+  xlab("Rating of likelihood of eating a Cricket Bar") +
+  scale_fill_manual(values=c("Pink", "LightBlue"), name="Gender") +
+  ggtitle("Gender differences in rating of likelihood of eating Cricket Bar") +
+  scale_x_continuous(limits=c(1, 10), breaks=0:10*1) +
+  theme_bw() +
+  theme(legend.position=c(.5, .8)) + 
+  guides(fill = guide_legend(nrow = 1))
 
+multiplot(G3, G4, cols=1)
 
 
 # Word cloud
@@ -432,10 +469,10 @@ cut6$Group <- as.factor(cut6$Group)
 BarChart1 <- ggplot(cut5, aes(x=Group, y=Rating, fill=BeforeAfter)) + 
   geom_bar(position=position_dodge(), stat="identity", colour="black", size=.3) +
   geom_errorbar(aes(ymin=Rating-se, ymax=Rating+se), size=.3, width=.2, position=position_dodge(.9)) +
-  xlab("") +
-  ylab("") +
+  xlab("Influence type") +
+  ylab("Rating of likelihood of eating a Whole cricket") +
   scale_fill_manual(values=c("#005ea7", "#a74900"), name="", breaks=c("0", "1"), labels=c("Before", "After")) +
-  ggtitle("Rating before and after for Cooked cricket") +
+  ggtitle("Rating before and after for Whole cricket") +
   scale_y_continuous(limits=c(0, 10), breaks=0:10*2) +
   theme_bw() +
   theme(legend.position=c(.15, .87))
@@ -449,10 +486,10 @@ BarChart2 <- ggplot(cut6, aes(x=Group, y=Rating, fill=BeforeAfter)) +
                 size=.3,    # Thinner lines
                 width=.2,
                 position=position_dodge(.9)) +
-  xlab("") +
-  ylab("") +
+  xlab("Influence type") +
+  ylab("Rating of likelihood of eating a Cricket bar") +
   scale_fill_manual(values=c("#005ea7", "#a74900"), name="", breaks=c("0", "1"), labels=c("Before", "After")) +
-  ggtitle("Rating before and after for Cricket flour bar") +
+  ggtitle("Rating before and after for Cricket bar") +
   scale_y_continuous(limits=c(0, 10), breaks=0:10*2) +   
   theme_bw()+
   theme(legend.position=c(.15, .87))
