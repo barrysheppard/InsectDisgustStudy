@@ -228,8 +228,8 @@ ChartRWA <- ggplot(dat, aes(x=RWAscore)) + geom_histogram(binwidth=5, colour="bl
   ggtitle("RWA Scores") +
   xlab("") +
   ylab("") +
-  theme_bw()
-ChartRWA
+  theme_bw() +
+  theme(plot.title = element_text(face="bold"))
 
 #Gender barchart
 ChartGender <- ggplot(dat, aes(x=Sex, fill=Sex)) + 
@@ -239,7 +239,8 @@ ChartGender <- ggplot(dat, aes(x=Sex, fill=Sex)) +
   ggtitle("Gender") +
   xlab("") +
   ylab("") +
-  stat_bin(binwidth=1, geom="text", aes(label=..count..), vjust= +2)
+  stat_bin(binwidth=1, geom="text", aes(label=..count..), vjust= +2) +
+  theme(plot.title = element_text(face="bold"))
 ChartGender
 
 #Age histogram
@@ -249,7 +250,8 @@ ChartAge <- ggplot(dat, aes(x=Age)) + geom_histogram(binwidth=5, colour="black",
   ggtitle("Age") +
   xlab("") +
   ylab("") +
-  theme_bw() 
+  theme_bw()  +
+  theme(plot.title = element_text(face="bold"))
 ChartAge
 
 # Country map
@@ -282,8 +284,9 @@ ChartCountries <- ggplot(dbar, aes(x=reorder(country, value),y=value,fill=countr
   coord_flip() +
   theme_bw()+
   scale_fill_manual(values=c("#10baa4", "#a410ba","#baa410", "#ba1026","#10baa4", "#ba4f10"), guide=FALSE) +
-  geom_text(aes(label = value), hjust=1)
-ChartCountries
+  geom_text(aes(label = value), hjust=1) +
+  theme(plot.title = element_text(face="bold"))
+
 
 #Multiplot doesn't draw the MapChart :( must only for ggplot
 multiplot(ChartAge, ChartGender, ChartCountries, ChartRWA, cols=2)
@@ -303,7 +306,8 @@ sp1 <- ggplot(dat, aes(x=Age, y=BeforeCricket)) +
   theme_bw() +
   xlab("Age") +
   ylab("Rating of likelihood to eat")+
-  theme(plot.title = element_text(face="bold"))
+  theme(plot.title = element_text(face="bold"), axis.title.x = element_text(face="bold"),axis.title.y = element_text(face="bold"))
+
 
 # Age correlation scatterplot for bug based bar
 sp2 <- ggplot(dat, aes(x=Age, y=BeforeCricketBar)) +
@@ -318,7 +322,8 @@ sp2 <- ggplot(dat, aes(x=Age, y=BeforeCricketBar)) +
   theme_bw()+
   xlab("Age") +
   ylab("Rating of likelihood to eat")+
-  theme(plot.title = element_text(face="bold"))
+  theme(plot.title = element_text(face="bold"), axis.title.x = element_text(face="bold"),axis.title.y = element_text(face="bold"))
+
 
 #Draw the plots
 multiplot(sp1, sp2, cols=2)
@@ -337,7 +342,8 @@ rwa2 <- ggplot(dat, aes(x=RWAscore, y=CricketChange)) +
   xlab("Right-Wing Authoritarianism score") +
   ylab("Change in rating of likelihood to eat") +
   theme_bw()+
-  theme(plot.title = element_text(face="bold"))
+  theme(plot.title = element_text(face="bold"), axis.title.x = element_text(face="bold"),axis.title.y = element_text(face="bold"))
+
 
 # RWA correlation scatterplot for cricket
 rwa3 <- ggplot(dat, aes(x=RWAscore, y=BarChange)) +
@@ -353,7 +359,8 @@ rwa3 <- ggplot(dat, aes(x=RWAscore, y=BarChange)) +
   theme(legend.position="top") +
   xlab("Right-Wing Authoritarianism score") +
   ylab("Change in rating of likelihood to eat")+
-  theme(plot.title = element_text(face="bold"))
+  theme(plot.title = element_text(face="bold"), axis.title.x = element_text(face="bold"),axis.title.y = element_text(face="bold"))
+
 
 #Draw the plots
 multiplot(rwa2, rwa3, cols=2)
@@ -388,7 +395,7 @@ multiplot(rwa2, rwa3, cols=2)
 # #Draw the plots
 # multiplot(bp1, bp2, cols=2)
 
-
+ 
 # Overlapped Gender Bar Chart
 
 G3 <- ggplot(dat, aes(x=BeforeCricket, fill=Sex)) + 
@@ -401,7 +408,8 @@ G3 <- ggplot(dat, aes(x=BeforeCricket, fill=Sex)) +
   scale_x_continuous(limits=c(1, 10), breaks=0:10*1) +
   theme_bw() +
   theme(legend.position=c(.5, .8)) + 
-  guides(fill = guide_legend(nrow = 1))
+  guides(fill = guide_legend(nrow = 1))+
+  theme(plot.title = element_text(face="bold"), axis.title.x = element_text(face="bold"),axis.title.y = element_text(face="bold"))
 
 G4 <- ggplot(dat, aes(x=BeforeCricketBar, fill=Sex)) + 
   geom_histogram(binwidth=1, alpha=.5, position="dodge", colour="black", size=.3) + 
@@ -413,9 +421,30 @@ G4 <- ggplot(dat, aes(x=BeforeCricketBar, fill=Sex)) +
   scale_x_continuous(limits=c(1, 10), breaks=0:10*1) +
   theme_bw() +
   theme(legend.position=c(.5, .8)) + 
-  guides(fill = guide_legend(nrow = 1))
+  guides(fill = guide_legend(nrow = 1))+
+  theme(plot.title = element_text(face="bold"), axis.title.x = element_text(face="bold"),axis.title.y = element_text(face="bold"))
 
 multiplot(G3, G4, cols=1)
+
+library("coin")
+x1 <- dat$BeforeCricket[dat$Sex=="Female"]
+y1 <- dat$BeforeCricket[dat$Sex=="Male"]
+wilcox.test(x1, y1, alternative = "t")
+
+x2 <- dat$BeforeCricketBar[dat$Sex=="Female"]
+y2 <- dat$BeforeCricketBar[dat$Sex=="Male"]
+wilcox.test(x2, y2, alternative = "t")
+
+x3 <- dat$CricketChange[dat$Sex=="Female"]
+y3 <- dat$CricketChange[dat$Sex=="Male"]
+wilcox.test(x3, y3, alternative = "t")
+
+x4 <- dat$BarChange[dat$Sex=="Female"]
+y4 <- dat$BarChange[dat$Sex=="Male"]
+wilcox.test(x4, y4, alternative = "t")
+
+
+
 
 
 # Word cloud
@@ -495,3 +524,60 @@ BarChart2 <- ggplot(cut6, aes(x=Group, y=Rating, fill=BeforeAfter)) +
   theme(legend.position=c(.15, .87))
 
 multiplot(BarChart1, BarChart2, cols=2)
+
+
+
+
+#Cricket Before and After
+cut1 <- summarySE(dat,measurevar="BeforeCricket", groupvars="Group")
+cut1$BeforeAfter <-c("0","0")
+cut1$Group <-c("Intellectual/Cricket","Social/Cricket")
+cut1$Influence <-c("Intellectual","Social")
+cut1$Food <-c("Whole Cricket","Whole Cricket")
+names(cut1)[names(cut1)=="BeforeCricket"] <- "Rating"
+
+cut2 <- summarySE(dat,measurevar="AfterCricket", groupvars="Group")
+cut2$BeforeAfter <-c("1","1")
+cut2$Group <-c("Intellectual/Cricket","Social/Cricket")
+cut2$Influence <-c("Intellectual","Social")
+cut2$Food <-c("Whole Cricket","Whole Cricket")
+names(cut2)[names(cut2)=="AfterCricket"] <- "Rating"
+
+#Cricket Bar Before and After
+cut3 <- summarySE(dat,measurevar="BeforeCricketBar", groupvars="Group")
+cut3$BeforeAfter <-c("0","0")
+cut3$Group <-c("Intellectual/CricketBar","Social/CricketBar")
+cut3$Influence <-c("Intellectual","Social")
+cut3$Food <-c("Cricket Bar","Cricket Bar")
+names(cut3)[names(cut3)=="BeforeCricketBar"] <- "Rating"
+
+cut4 <- summarySE(dat,measurevar="AfterCricketBar", groupvars="Group")
+cut4$BeforeAfter <-c("1","1")
+cut4$Group <-c("Intellectual/CricketBar","Social/CricketBar")
+names(cut4)[names(cut4)=="AfterCricketBar"] <- "Rating"
+cut4$Influence <-c("Intellectual","Social")
+cut4$Food <-c("Cricket Bar","Cricket Bar")
+
+cut5 <- rbind(cut1,cut2,cut3,cut4)
+
+cut5$BeforeAfter <- as.factor(cut5$BeforeAfter)
+cut5$Group <- as.factor(cut5$Group)
+
+
+
+# A line graph
+
+Palette <- c("#0b4027", "#940b0b")
+ggplot(data=cut5, aes(x=BeforeAfter, y=Rating, group=Group, shape=Food, colour=Influence)) +
+  geom_line(size=1) + 
+  geom_point(size=6, fill="white") +         # Use larger points, fill with white
+  scale_y_continuous(limits=c(4, 8), breaks=0:10*1) +
+  scale_shape_discrete(name  ="Type of Food") +
+  scale_colour_discrete(name  ="Influence Type") +
+  scale_x_discrete(breaks=c("0", "1"), labels=c("Before", "After")) +
+  coord_cartesian(xlim=c(.7, 2.2)) + 
+  xlab("Before and After") + ylab("Rating of Likelihood of consuming") + # Set axis labels
+  ggtitle("Differences in rating before and after influence") +  # Set title
+  theme_bw() +
+  scale_colour_manual(values=Palette) + 
+  theme(plot.title = element_text(face="bold"), axis.title.x = element_text(face="bold"),axis.title.y = element_text(face="bold"))
