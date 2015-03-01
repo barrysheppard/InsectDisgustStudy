@@ -1,0 +1,261 @@
+---
+title: "Descriptives"
+author: "Barry Sheppard"
+date: "1 March 2015"
+output: html_document
+---
+
+This document provides a breakdown of the statistical analysis from a research study.
+
+Below loads the raw data file into the system and outputs the file list of headers in the data set.
+
+```{r}
+# Import dataset
+dat <- read.csv("DisgustData.csv")
+# Return the names of the datset
+names(dat)
+```
+
+
+Next up the headers of the dataset are renamed to make things a little easier. 
+
+```{r}
+# Recoding the data for use
+
+# Shorten some of the names
+names(dat)[5] <- "Age"
+names(dat)[6] <- "Sex"
+names(dat)[7] <- "RWA01"
+names(dat)[8] <- "RWA02"
+names(dat)[9] <- "RWA03"
+names(dat)[10] <- "RWA04"
+names(dat)[11] <- "RWA05"
+names(dat)[12] <- "RWA06"
+names(dat)[13] <- "RWA07"
+names(dat)[14] <- "RWA08"
+names(dat)[15] <- "RWA09"
+names(dat)[16] <- "RWA10"
+names(dat)[17] <- "RWA11"
+names(dat)[18] <- "RWA12"
+names(dat)[19] <- "RWA13"
+names(dat)[20] <- "RWA14"
+names(dat)[21] <- "RWA15"
+names(dat)[22] <- "RWA16"
+names(dat)[23] <- "RWA17"
+names(dat)[24] <- "RWA18"
+names(dat)[25] <- "RWA19"
+names(dat)[26] <- "RWA20"
+names(dat)[27] <- "RWA21"
+names(dat)[28] <- "RWA22"
+names(dat)[29] <- "BeforeCricket"
+names(dat)[30] <- "BeforeCricketBar"
+names(dat)[31] <- "Group"
+names(dat)[32] <- "AfterCricketBar"
+names(dat)[33] <- "AfterCricket"
+names(dat)[34] <- "Comments"
+
+```
+
+
+The Right Wing Authoritarianism scale still needs to be calculated. 
+
+We also need to calculate the changes in rating for the food types and add these to the dataset.
+
+
+
+```{r}
+
+# Function to change the Likert results from the long form to a number
+library(plyr)
+likert_to_number <- function(x){
+  x <- revalue(x, c("-4 You very strongly disagree with the statement."="-4",
+                                    "-3 You strongly disagree with the statement. "="-3",
+                                    "-2 You moderately disagree with the statement."="-2",
+                                    "-1 You slightly disagree with the statement."="-1",
+                                    "0 You feel exactly and precisely neutral about an item."="0",
+                                    "+1 You slightly agree with the statement. "="1",
+                                    "+2 You moderately agree with the statement."="2",
+                                    "+3 You strongly agree with the statement. "="3",
+                                    "+4 You very strongly agree with the statement."="4"
+ )   )
+  
+  return(x)
+}
+
+dat$RWA01 <- likert_to_number(dat$RWA01)
+dat$RWA02 <- likert_to_number(dat$RWA02)
+dat$RWA03 <- likert_to_number(dat$RWA03)
+dat$RWA04 <- likert_to_number(dat$RWA04)
+dat$RWA05 <- likert_to_number(dat$RWA05)
+dat$RWA06 <- likert_to_number(dat$RWA06)
+dat$RWA07 <- likert_to_number(dat$RWA07)
+dat$RWA08 <- likert_to_number(dat$RWA08)
+dat$RWA09 <- likert_to_number(dat$RWA09)
+dat$RWA10 <- likert_to_number(dat$RWA10)
+dat$RWA11 <- likert_to_number(dat$RWA11)
+dat$RWA12 <- likert_to_number(dat$RWA12)
+dat$RWA13 <- likert_to_number(dat$RWA13)
+dat$RWA14 <- likert_to_number(dat$RWA14)
+dat$RWA15 <- likert_to_number(dat$RWA15)
+dat$RWA16 <- likert_to_number(dat$RWA16)
+dat$RWA17 <- likert_to_number(dat$RWA17)
+dat$RWA18 <- likert_to_number(dat$RWA18)
+dat$RWA19 <- likert_to_number(dat$RWA19)
+dat$RWA20 <- likert_to_number(dat$RWA20)
+dat$RWA21 <- likert_to_number(dat$RWA21)
+dat$RWA22 <- likert_to_number(dat$RWA22)
+
+
+# Next lets score the RWA results
+
+# Scores go from 20 to 180
+# Question 1 and 2 are test questions and not used
+# Positive scores are 3, 5, 7, 10, 12, 14, 16, 17, 19 and 22 
+# Add all the positive scores and add 50
+# The remainder are reversed questions, we could recode but its easier to do the following
+# Start with 50 and substract the total of the negative scores
+
+dat$RWAscore <- 100 + as.numeric(as.character(dat$RWA03)) + as.numeric(as.character(dat$RWA05)) + 
+  as.numeric(as.character(dat$RWA07)) + as.numeric(as.character(dat$RWA10)) + as.numeric(as.character(dat$RWA12)) + 
+  as.numeric(as.character(dat$RWA14)) + as.numeric(as.character(dat$RWA16)) + as.numeric(as.character(dat$RWA17)) + 
+  as.numeric(as.character(dat$RWA19)) + as.numeric(as.character(dat$RWA22)) - as.numeric(as.character(dat$RWA04)) - 
+  as.numeric(as.character(dat$RWA06)) - as.numeric(as.character(dat$RWA08)) - as.numeric(as.character(dat$RWA09)) - 
+  as.numeric(as.character(dat$RWA11)) - as.numeric(as.character(dat$RWA13)) - as.numeric(as.character(dat$RWA15)) - 
+  as.numeric(as.character(dat$RWA18)) - as.numeric(as.character(dat$RWA20)) - as.numeric(as.character(dat$RWA21))
+
+# Calculate the changes in rating
+dat$CricketChange <- dat$AfterCricket - dat$BeforeCricket
+dat$BarChange <- dat$AfterCricketBar - dat$BeforeCricket
+
+# Return the updated names of the dataset
+names(dat)
+
+```
+
+
+Some basic descriptive info on the data in numbers
+
+```{r}
+
+library(psych)
+describe(dat$Age)
+describe(dat$BeforeCricket)
+describe(dat$BeforeCricketBar)
+describe(dat$AfterCricket)
+describe(dat$AfterCricketBar)
+describe(dat$RWAscore)
+describe(dat$CricketChange)
+describe(dat$BarChange)
+
+
+```
+
+Lets produce some charts to visualise the data
+
+```{r, echo=FALSE}
+
+# Lets do some charts!
+
+library(ggplot2)
+
+# Demographics
+
+describe(dat$RWAscore)
+
+# RWA histogram
+ChartRWA <- ggplot(dat, aes(x=RWAscore)) + geom_histogram(binwidth=5, colour="black", fill="lightgrey") +
+  geom_vline(aes(xintercept=mean(RWAscore)),   # Ignore NA values for mean
+             color="#ba1026", linetype="dashed", size=1) +
+  ggtitle("RWA Scores") +
+  xlab("") +
+  ylab("") +
+  theme_bw()
+ChartRWA
+
+
+# Gender barchart
+ChartGender <- ggplot(dat, aes(x=Sex, fill=Sex)) + 
+  theme_bw() +
+  geom_bar(binwidth=5, colour="Black", guide=FALSE) +
+  scale_fill_manual(values=c("pink", "lightblue"), guide=FALSE) +
+  ggtitle("Gender") +
+  xlab("") +
+  ylab("") +
+  stat_bin(binwidth=1, geom="text", aes(label=..count..), vjust= +2)
+ChartGender
+
+describe(dat$Age)
+
+#Age histogram
+ChartAge <- ggplot(dat, aes(x=Age)) + geom_histogram(binwidth=5, colour="black", fill="lightgrey") +
+  geom_vline(aes(xintercept=mean(Age)),   # Ignore NA values for mean
+             color="#ba1026", linetype="dashed", size=1) +
+  ggtitle("Age") +
+  xlab("") +
+  ylab("") +
+  theme_bw() 
+ChartAge
+
+# Groups barchart
+ChartGroups <- ggplot(dat, aes(x=Group, fill=Group)) + 
+  theme_bw() +
+  geom_bar(binwidth=5, colour="Black", guide=FALSE) +
+  scale_fill_manual(values=c("lightgreen", "lightyellow"), guide=FALSE) +
+  ggtitle("Group") +
+  xlab("") +
+  ylab("") +
+  stat_bin(binwidth=1, geom="text", aes(label=..count..), vjust= +2)
+ChartGroups
+
+describe(dat$BeforeCricket)
+
+# Before rating Cricket
+ChartBCricket <- ggplot(dat, aes(x=BeforeCricket)) + geom_histogram(binwidth=1, colour="black", fill="lightgrey") +
+  geom_vline(aes(xintercept=mean(BeforeCricket)),   # Ignore NA values for mean
+             color="#ba1026", linetype="dashed", size=1) +
+  ggtitle("Before Whole Cricket") +
+  xlab("") +
+  ylab("") +
+  theme_bw()
+ChartBCricket
+
+describe(dat$AfterCricket)
+
+# After rating Cricket
+ChartACricket <- ggplot(dat, aes(x=AfterCricket)) + geom_histogram(binwidth=1, colour="black", fill="lightgrey") +
+  geom_vline(aes(xintercept=mean(AfterCricket)),   # Ignore NA values for mean
+             color="#ba1026", linetype="dashed", size=1) +
+  ggtitle("After Whole Cricket") +
+  xlab("") +
+  ylab("") +
+  theme_bw()
+ChartACricket
+
+describe(dat$BeforeCricketBar)
+
+# Before rating Cricket
+ChartBCricketBar <- ggplot(dat, aes(x=BeforeCricketBar)) + geom_histogram(binwidth=1, colour="black", fill="lightgrey") +
+  geom_vline(aes(xintercept=mean(BeforeCricketBar)),   # Ignore NA values for mean
+             color="#ba1026", linetype="dashed", size=1) +
+  ggtitle("Before Cricket Bar") +
+  xlab("") +
+  ylab("") +
+  theme_bw()
+ChartBCricketBar
+
+describe(dat$AfterCricketBar)
+
+# After rating Cricket
+ChartACricketBar <- ggplot(dat, aes(x=AfterCricketBar)) + geom_histogram(binwidth=1, colour="black", fill="lightgrey") +
+  geom_vline(aes(xintercept=mean(AfterCricketBar)),   # Ignore NA values for mean
+             color="#ba1026", linetype="dashed", size=1) +
+  ggtitle("After Cricket Bar") +
+  xlab("") +
+  ylab("") +
+  theme_bw()
+ChartACricketBar
+
+```
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plots.

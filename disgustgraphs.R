@@ -16,15 +16,11 @@ library(rworldmap)
 #Main dataset
 dat <- read.csv("DisgustData.csv")
 
+names(dat)
+
 #Shorten some of the names
 names(dat)[5] <- "Age"
 names(dat)[6] <- "Sex"
-names(dat)[29] <- "BeforeCricket"
-names(dat)[30] <- "BeforeCricketBar"
-names(dat)[31] <- "Group"
-names(dat)[32] <- "AfterCricketBar"
-names(dat)[33] <- "AfterCricket"
-
 names(dat)[7] <- "RWA01"
 names(dat)[8] <- "RWA02"
 names(dat)[9] <- "RWA03"
@@ -47,6 +43,11 @@ names(dat)[25] <- "RWA19"
 names(dat)[26] <- "RWA20"
 names(dat)[27] <- "RWA21"
 names(dat)[28] <- "RWA22"
+names(dat)[29] <- "BeforeCricket"
+names(dat)[30] <- "BeforeCricketBar"
+names(dat)[31] <- "Group"
+names(dat)[32] <- "AfterCricketBar"
+names(dat)[33] <- "AfterCricket"
 names(dat)[34] <- "Comments"
 
 
@@ -292,6 +293,12 @@ ChartCountries <- ggplot(dbar, aes(x=reorder(country, value),y=value,fill=countr
 multiplot(ChartAge, ChartGender, ChartCountries, ChartRWA, cols=2)
 
 
+# Kendalls Tau between Age and BeforeCricket, 
+cor.test(dat$Age, dat$BeforeCricket, method="kendall", alternative="two.sided") 
+cor.test(dat$Age, dat$BeforeCricketBar, method="kendall", alternative="two.sided") 
+
+
+
 #SCATTERPLOTS
 
 # Age correlation scatterplot for Whole crickets
@@ -301,7 +308,7 @@ sp1 <- ggplot(dat, aes(x=Age, y=BeforeCricket)) +
   #  geom_point(shape=1,position=position_jitter(height=.2)) +   
   geom_smooth(method=lm) +   # Add linear regression line 
 #  (by default includes 95% confidence region)
-  ggtitle("Whole cricket") +
+  ggtitle("Correlation of Likelihood to eat Whole cricket with Age") +
   scale_y_continuous(limits=c(1, 10), breaks=0:10*2) +   
   theme_bw() +
   xlab("Age") +
@@ -317,16 +324,15 @@ sp2 <- ggplot(dat, aes(x=Age, y=BeforeCricketBar)) +
              alpha=1/4) +    # 1/4 opacity
   geom_smooth(method=lm) +   # Add linear regression line 
   #  (by default includes 95% confidence region)
-  ggtitle("Cricket flour bar")+
-  scale_y_continuous(limits=c(1, 10), breaks=0:10*2) +   
+  ggtitle("Correlation of Likelihood to eat Cricket bar with Age") +
+  scale_y_continuous(limits=c(1, 10), breaks=0:10*2) +    
   theme_bw()+
   xlab("Age") +
   ylab("Rating of likelihood to eat")+
   theme(plot.title = element_text(face="bold"), axis.title.x = element_text(face="bold"),axis.title.y = element_text(face="bold"))
 
-
 #Draw the plots
-multiplot(sp1, sp2, cols=2)
+multiplot(sp1, sp2, cols=1)
 
 
 # RWA correlation scatterplot for cricket
@@ -336,11 +342,12 @@ rwa2 <- ggplot(dat, aes(x=RWAscore, y=CricketChange)) +
              alpha=1/4) +    # 1/4 opacity
   geom_smooth(method=lm) +   # Add linear regression line 
   #  (by default includes 95% confidence region)
-  ggtitle("RWA / Whole cricket rating change") +
+  ggtitle("Correlation of Change in Likelihood to eat Whole cricket with RWA") +
   scale_y_continuous(limits=c(-6, 7), breaks=-5:5*2) +  
+  scale_x_continuous(limits=c(20, 140), breaks=0:140*20) +  
   theme(legend.position="top") +
   xlab("Right-Wing Authoritarianism score") +
-  ylab("Change in rating of likelihood to eat") +
+  ylab("Change in Likelihood to eat") +
   theme_bw()+
   theme(plot.title = element_text(face="bold"), axis.title.x = element_text(face="bold"),axis.title.y = element_text(face="bold"))
 
@@ -354,16 +361,16 @@ rwa3 <- ggplot(dat, aes(x=RWAscore, y=BarChange)) +
   geom_smooth(method=lm) +   # Add linear regression line 
   #  (by default includes 95% confidence region)
   theme_bw() +
-  ggtitle("RWA / Cricket flour bar rating change") +
+  ggtitle("Correlation of Change in Likelihood to eat Cricket bar with RWA") +
   scale_y_continuous(limits=c(-6, 7), breaks=-5:5*2) +  
+  scale_x_continuous(limits=c(20, 140), breaks=0:140*20) +  
   theme(legend.position="top") +
   xlab("Right-Wing Authoritarianism score") +
-  ylab("Change in rating of likelihood to eat")+
+  ylab("Change in Likelihood to eat")+
   theme(plot.title = element_text(face="bold"), axis.title.x = element_text(face="bold"),axis.title.y = element_text(face="bold"))
 
-
 #Draw the plots
-multiplot(rwa2, rwa3, cols=2)
+multiplot(rwa2, rwa3, cols=1)
 
 
 #BOX PLOTS - After feedback the boxplots were taken out
@@ -399,12 +406,13 @@ multiplot(rwa2, rwa3, cols=2)
 # Overlapped Gender Bar Chart
 
 G3 <- ggplot(dat, aes(x=BeforeCricket, fill=Sex)) + 
-  geom_histogram(binwidth=1, alpha=.5, position="dodge", colour="black", size=.3) + 
+  geom_histogram(binwidth=1, alpha=.5, position="dodge", size=.3) + 
+  geom_histogram(binwidth=1, alpha=.5, position="dodge", colour="black", size=.3, show_guide=FALSE) + 
   theme_bw() +
   ylab("Number of participants") +
   xlab("Rating of likelihood of eating a Whole cricket") +
   scale_fill_manual(values=c("Pink", "LightBlue"), name="Gender") +
-  ggtitle("Gender differences in rating of likelihood of eating Whole Cricket") +
+  ggtitle("Gender differences in rating of likelihood of eating Whole cricket") +
   scale_x_continuous(limits=c(1, 10), breaks=0:10*1) +
   theme_bw() +
   theme(legend.position=c(.5, .8)) + 
@@ -412,12 +420,13 @@ G3 <- ggplot(dat, aes(x=BeforeCricket, fill=Sex)) +
   theme(plot.title = element_text(face="bold"), axis.title.x = element_text(face="bold"),axis.title.y = element_text(face="bold"))
 
 G4 <- ggplot(dat, aes(x=BeforeCricketBar, fill=Sex)) + 
-  geom_histogram(binwidth=1, alpha=.5, position="dodge", colour="black", size=.3) + 
+  geom_histogram(binwidth=1, alpha=.5, position="dodge", size=.3) + 
+  geom_histogram(binwidth=1, alpha=.5, position="dodge", colour="black", size=.3, show_guide=FALSE) + 
   theme_bw() +
   ylab("Number of participants") +
-  xlab("Rating of likelihood of eating a Cricket Bar") +
+  xlab("Rating of likelihood of eating a Cricket bar") +
   scale_fill_manual(values=c("Pink", "LightBlue"), name="Gender") +
-  ggtitle("Gender differences in rating of likelihood of eating Cricket Bar") +
+  ggtitle("Gender differences in rating of likelihood of eating Cricket bar") +
   scale_x_continuous(limits=c(1, 10), breaks=0:10*1) +
   theme_bw() +
   theme(legend.position=c(.5, .8)) + 
@@ -576,8 +585,9 @@ ggplot(data=cut5, aes(x=BeforeAfter, y=Rating, group=Group, shape=Food, colour=I
   scale_colour_discrete(name  ="Influence Type") +
   scale_x_discrete(breaks=c("0", "1"), labels=c("Before", "After")) +
   coord_cartesian(xlim=c(.7, 2.2)) + 
-  xlab("Before and After") + ylab("Rating of Likelihood of consuming") + # Set axis labels
-  ggtitle("Differences in rating before and after influence") +  # Set title
+  guides(colour = guide_legend(override.aes = list(shape = 15))) +
+  xlab("Before and After") + ylab("Rating of Likelihood to eat") + # Set axis labels
+  ggtitle("Mean Rating of likelihood to eat Before and After influence") +  # Set title
   theme_bw() +
   scale_colour_manual(values=Palette) + 
   theme(plot.title = element_text(face="bold"), axis.title.x = element_text(face="bold"),axis.title.y = element_text(face="bold"))
